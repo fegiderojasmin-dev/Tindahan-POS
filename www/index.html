@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Tindahan POS</title>
+<style>
+:root{--bg:#eef1f6;--card:#fff;--ink:#14213d;--mut:#6b7488;--pri:#1f4fd8;--on:#fff;--acc:#ffc933;--ok:#168a4a;--bad:#d6361f;--line:#dde2ec;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px)}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0d1220;--card:#171f33;--ink:#eef1f8;--mut:#939bb3;--pri:#5b82ff;--line:#2a3450;--ok:#3fcf82;--bad:#ff6a54}}
+:root[data-theme="dark"]{--bg:#0d1220;--card:#171f33;--ink:#eef1f8;--mut:#939bb3;--pri:#5b82ff;--line:#2a3450;--ok:#3fcf82;--bad:#ff6a54}
+*{box-sizing:border-box}html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font:15px/1.4 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;padding-bottom:calc(72px + env(safe-area-inset-bottom,0px))}
+header{background:var(--pri);color:#fff;padding:12px 16px;display:flex;justify-content:space-between;align-items:center;position:sticky;top:env(safe-area-inset-top,0px);z-index:5}
+header b{font-size:18px;letter-spacing:.2px}header span{background:var(--acc);color:#14213d;border-radius:99px;padding:3px 10px;font-weight:700;font-size:13px}
+main{max-width:640px;margin:0 auto;padding:12px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:12px;margin-bottom:12px}
+h3{margin:0 0 8px;font-size:16px}
+input,select,textarea{width:100%;padding:11px;border:1.5px solid var(--line);border-radius:10px;background:var(--bg);color:var(--ink);font:inherit;margin-bottom:8px}
+input:focus,select:focus,button:focus-visible{outline:2px solid var(--pri);outline-offset:1px}
+.row{display:flex;gap:8px}.row>*{flex:1}
+button{font:inherit;font-weight:700;border:0;border-radius:10px;padding:11px 14px;background:var(--pri);color:#fff;cursor:pointer}
+button.alt{background:var(--bg);color:var(--ink);border:1.5px solid var(--line)}button.bad{background:var(--bad)}button.ok{background:var(--ok)}button.sm{padding:6px 10px;font-size:13px}
+button.big{width:100%;padding:14px;font-size:16px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:8px}
+.p{background:var(--card);border:1.5px solid var(--line);border-left:6px solid var(--acc);color:var(--ink);text-align:left;padding:10px;font-weight:600;position:relative}
+.p small{display:block;color:var(--mut);font-weight:400}.p b{color:var(--pri);font-size:16px}.p.out{opacity:.45}
+.li{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:8px 0;border-bottom:1px solid var(--line)}.li:last-child{border:0}
+.mut{color:var(--mut);font-size:13px}.r{text-align:right}.g{color:var(--ok);font-weight:700}.d{color:var(--bad);font-weight:700}
+.stats{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px}.stats div{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:10px}.stats b{display:block;font-size:20px}
+.q{display:flex;align-items:center;gap:6px}.q button{padding:4px 10px}
+nav{position:fixed;bottom:0;left:0;right:0;background:var(--card);border-top:1px solid var(--line);display:flex;padding-bottom:env(safe-area-inset-bottom,0px);z-index:6}
+nav button{flex:1;background:none;color:var(--mut);border-radius:0;padding:10px 2px;font-size:12px;display:flex;flex-direction:column;align-items:center;gap:2px}
+nav button i{font-style:normal;font-size:20px}nav button.on{color:var(--pri);box-shadow:inset 0 3px 0 var(--pri)}
+#toast{position:fixed;left:50%;bottom:calc(84px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:10px 16px;border-radius:99px;opacity:0;pointer-events:none;transition:opacity .2s;z-index:9;max-width:90%}
+#toast.s{opacity:1}
+.tag{display:inline-block;font-size:11px;font-weight:700;padding:2px 7px;border-radius:6px;background:var(--acc);color:#14213d}
+.empty{text-align:center;color:var(--mut);padding:18px}
+.ov{position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:20;display:flex;align-items:flex-end;justify-content:center}
+.sheet{background:var(--card);width:100%;max-width:640px;border-radius:16px 16px 0 0;padding:14px;max-height:94%;overflow:auto;padding-bottom:calc(14px + env(safe-area-inset-bottom,0px))}
+#rd{width:100%;border-radius:10px;overflow:hidden;background:#111;color:#fff;min-height:180px;margin-bottom:8px}
+.rc{font:13px/1.5 ui-monospace,Menlo,monospace;white-space:pre-wrap;background:#fff;color:#000;padding:12px;border-radius:8px;border:1px dashed #999;margin:0}
+@media print{header,main,nav,#toast,.noprint{display:none!important}.ov{position:static;background:none}.sheet{max-height:none;padding:0}body{padding:0}}
+body{font-size:16px;padding-bottom:calc(150px + env(safe-area-inset-bottom,0px))}
+header{padding:14px 16px}header b{font-size:19px}
+button{min-height:46px;border-radius:12px}button.sm{min-height:38px;padding:6px 12px}
+input,select{min-height:48px;font-size:16px;border-radius:12px}
+.card{border-radius:16px;box-shadow:0 1px 3px rgba(20,33,61,.07)}
+.li{padding:11px 0}.stats b{font-size:22px}
+.grid{grid-template-columns:repeat(2,1fr);gap:10px}@media(min-width:480px){.grid{grid-template-columns:repeat(3,1fr)}}
+.p{display:flex;flex-direction:column;gap:2px;min-height:124px;border-left:1.5px solid var(--line);border-radius:14px;padding:12px}
+.p .nm{font-size:14px;line-height:1.2;font-weight:700;margin-bottom:2px}.p b{font-size:18px;margin-top:auto}
+.p.in{border-color:var(--pri);box-shadow:inset 0 0 0 2px var(--pri)}
+.av{width:38px;height:38px;border-radius:50%;display:grid;place-items:center;font-weight:800;color:#fff;margin-bottom:6px}
+.bd{position:absolute;top:8px;right:8px;background:var(--pri);color:#fff;border-radius:99px;min-width:28px;height:28px;display:grid;place-items:center;font-size:14px;font-weight:800;padding:0 7px}
+.lowc{color:var(--bad)!important;font-weight:700}
+.chips{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px}.chips button{flex:1;min-width:52px;padding:8px 4px}
+#chg{font-size:18px;font-weight:800}
+#bar{position:fixed;left:12px;right:12px;bottom:calc(68px + env(safe-area-inset-bottom,0px));z-index:7;max-width:616px;margin:0 auto}
+nav button{font-size:12px;min-height:60px}nav button i{font-size:22px}nav button.on{background:color-mix(in srgb,var(--pri) 10%,transparent)}
+</style></head><body>
+<header><b id="hn">🏪 Tindahan POS</b><span id="hd"></span></header>
+<main id="m"></main><div id="toast"></div><div id="ovr"></div>
+<div id="bar"></div><nav id="nav"></nav>
+<script src="html5-qrcode.min.js"></script>
+<script>window.Html5Qrcode||document.write('<script src="https://cdnjs.cloudflare.com/ajax/libs/html5-qrcode/2.3.8/html5-qrcode.min.js"><\/script>')</script>
+<script>
+const K='tindahan_v1';
+const SAMPLE=[['Lucky Me Pancit Canton',9,13,40],['Coke Mismo',14,20,24],['Kopiko 3in1 (sachet)',3.5,5,60],['Safeguard Soap',22,30,12],['Itlog (piece)',8,10,30],['Marlboro (stick)',6,8,40],['Tubig 500ml',9,15,24],['Tide Sachet',6,8,30]];
+let db=null;try{db=JSON.parse(localStorage.getItem(K))}catch(e){}
+if(!db||!db.products)db={products:SAMPLE.map((p,i)=>({id:'p'+i,name:p[0],cost:p[1],price:p[2],stock:p[3]})),sales:[],cust:[],wallet:[]};
+const save=()=>{try{localStorage.setItem(K,JSON.stringify(db))}catch(e){}};
+const $=id=>document.getElementById(id);
+const uid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,6);
+const peso=n=>'₱'+Number(n||0).toLocaleString('en-PH',{minimumFractionDigits:2,maximumFractionDigits:2});
+const day=ts=>new Date(ts).toLocaleDateString('en-CA');
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const tm=ts=>new Date(ts).toLocaleTimeString('en-PH',{hour:'2-digit',minute:'2-digit'});
+let tab='pos',cart={},q='',method='cash',custSel='',open='',sday=day(Date.now()),exp='',disc='0',cdisc=0,idno='',pendingCode='',draft={},scanMode='',last={code:'',t:0},scanner=null;
+function toast(t){const e=$('toast');e.textContent=t;e.className='s';clearTimeout(toast.t);toast.t=setTimeout(()=>e.className='',2200)}
+const bal=c=>c.ledger.reduce((a,l)=>a+(l.type==='utang'?l.amt:-l.amt),0);
+const sub=()=>Object.entries(cart).reduce((a,[id,n])=>a+n*db.products.find(p=>p.id===id).price,0);
+const discAmt=()=>{const r=disc==='c'?cdisc:+disc;return Math.round(sub()*Math.min(100,Math.max(0,r)))/100};
+const total=()=>sub()-discAmt();
+const TABS=[['pos','🛒','Benta'],['sales','🧾','Sales'],['utang','📒','Utang'],['wallet','📱','E-Wallet'],['items','📦','Items']];
+function nav(){$('nav').innerHTML=TABS.map(t=>`<button class="${tab===t[0]?'on':''}" data-t="${t[0]}"><i>${t[1]}</i>${t[2]}</button>`).join('')}
+function render(){
+  nav();const td=day(Date.now());
+  $('hd').textContent='Today '+peso(db.sales.filter(s=>day(s.ts)===td).reduce((a,s)=>a+s.total,0));
+  $('m').innerHTML=({pos:vPos,sales:vSales,utang:vUtang,wallet:vWallet,items:vItems})[tab]();
+  if(tab==='pos')grid();bar();$('hn').textContent='🏪 '+(db.store||'Tindahan POS');
+}
+function vPos(){
+  return `${db.tip?'':`<div class="card" style="background:var(--acc);color:#14213d;border:0"><b>👋 Welcome!</b> Tap an item to add it to the cart. Tap 📷 Scan to use barcodes. Add your own products in the Items tab.<div style="margin-top:8px"><button class="sm" data-tip="1" style="background:#14213d">Got it</button></div></div>`}<div class="row"><input id="q" placeholder="Search or type barcode…" value="${esc(q)}" autocomplete="off"><button data-scan="pos" style="flex:0 0 auto;margin-bottom:8px">📷 Scan</button></div><div id="grid" class="grid"></div>
+  <div class="card" id="cartcard" style="margin-top:12px"><h3>🛒 Cart</h3><div id="cart"></div></div>`;
+}
+function grid(){
+  const l=db.products.filter(p=>p.name.toLowerCase().includes(q.toLowerCase())||(p.barcode||'').includes(q));
+  $('grid').innerHTML=l.length?l.map(p=>`<button class="p ${p.stock<=0?'out':''}${cart[p.id]?' in':''}" data-add="${p.id}"><span class="av" style="background:hsl(${hue(p.name)} 55% 42%)">${esc((p.name[0]||'?').toUpperCase())}</span>${cart[p.id]?'<span class="bd">'+cart[p.id]+'</span>':''}<span class="nm">${esc(p.name)}</span><small class="${p.stock<=5?'lowc':''}">${p.stock<=0?'Out of stock':p.stock+' left'}</small><b>${peso(p.price)}</b></button>`).join(''):'<div class="empty">No items. Add some in the Items tab.</div>';
+  cartR();
+}
+function cartR(){
+  const ids=Object.keys(cart),t=total();
+  let h=ids.length?ids.map(id=>{const p=db.products.find(x=>x.id===id);return `<div class="li"><div>${esc(p.name)}<div class="mut">${peso(p.price)} each</div></div><div class="q"><button class="alt sm" data-dec="${id}">−</button><b>${cart[id]}</b><button class="alt sm" data-add="${id}">+</button></div><b>${peso(cart[id]*p.price)}</b></div>`}).join(''):'<div class="empty">Tap an item to add it.</div>';
+  if(ids.length){
+    h+=`<select id="dsel"><option value="0" ${disc==='0'?'selected':''}>No discount</option><option value="20" ${disc==='20'?'selected':''}>Senior / PWD 20%</option><option value="c" ${disc==='c'?'selected':''}>Custom %</option></select>${disc==='c'?'<input id="dc" type="number" inputmode="decimal" placeholder="Discount %" value="'+cdisc+'">':''}${disc!=='0'?'<input id="idn" placeholder="Senior/PWD ID no. (optional)" value="'+esc(idno)+'">':''}${disc!=='0'?`<div class="li"><span>Subtotal ${peso(sub())}</span><span class="d">− ${peso(discAmt())}</span></div>`:''}<div class="li"><b style="font-size:20px">Total</b><b style="font-size:22px;color:var(--pri)">${peso(t)}</b></div>
+    <div class="row"><button class="${method==='cash'?'':'alt'}" data-m="cash">Cash</button><button class="${method==='utang'?'':'alt'}" data-m="utang">Utang</button></div><div style="height:8px"></div>`;
+    if(method==='cash')h+=`<input id="tend" type="number" inputmode="decimal" placeholder="Cash received (optional)"><div class="chips"><button class="alt" data-cash="x">Exact</button>${[50,100,200,500,1000].map(v=>`<button class="alt" data-cash="${v}">${v}</button>`).join('')}</div><div id="chg" style="margin-bottom:8px"></div>`;
+    else h+=`<select id="csel"><option value="">Choose customer…</option>${db.cust.map(c=>`<option value="${c.id}" ${custSel===c.id?'selected':''}>${esc(c.name)} (owes ${peso(bal(c))})</option>`).join('')}</select>`;
+    h+=`<button class="ok big" data-co="1">Charge ${peso(t)}</button><div style="height:8px"></div><button class="alt big" data-clr="1">Clear cart</button>`;
+  }
+  $('cart').innerHTML=h;bar();
+}
+function checkout(){
+  const t=total();if(!t)return;
+  let cid=null;
+  if(method==='utang'){
+    cid=custSel;const c=db.cust.find(x=>x.id===cid);
+    if(!c)return toast('Choose a customer first');
+    if(c.limit>0&&bal(c)+t>c.limit)return toast('Over credit limit ('+peso(c.limit)+')');
+  }
+  const tend=parseFloat(($('tend')||{}).value)||0;
+  if(method==='cash'&&tend&&tend<t)return toast('Cash is less than total');
+  const items=Object.entries(cart).map(([id,n])=>{const p=db.products.find(x=>x.id===id);p.stock-=n;return{id,name:p.name,qty:n,price:p.price,cost:p.cost}});
+  const da=discAmt();const s={id:uid(),ts:Date.now(),items,total:t,profit:items.reduce((a,i)=>a+i.qty*(i.price-i.cost),0)-da,disc:da,idno:disc!=='0'?idno:'',tend:method==='cash'?tend:0,method,cid};
+  db.sales.unshift(s);
+  if(cid)db.cust.find(c=>c.id===cid).ledger.push({id:uid(),ts:s.ts,type:'utang',amt:t,note:'Benta',sid:s.id});
+  const ch=method==='cash'&&tend?tend-t:0;
+  cart={};disc='0';cdisc=0;idno='';save();render();toast(ch>0?'Done! Change: '+peso(ch):'Sale saved');showRc(s);
+}
+function vSales(){
+  const l=db.sales.filter(s=>day(s.ts)===sday),sum=f=>l.filter(f).reduce((a,s)=>a+s.total,0);
+  const w=db.wallet.filter(x=>day(x.ts)===sday).reduce((a,x)=>a+x.fee,0),pr=l.reduce((a,s)=>a+s.profit,0);
+  return `<input type="date" id="sd" value="${sday}">
+  <div class="stats"><div><span class="mut">Total sales</span><b>${peso(sum(()=>1))}</b></div><div><span class="mut">Profit (items)</span><b class="g">${peso(pr)}</b></div><div><span class="mut">Cash</span><b>${peso(sum(s=>s.method==='cash'))}</b></div><div><span class="mut">Utang</span><b class="d">${peso(sum(s=>s.method==='utang'))}</b></div></div>
+  <div class="card"><div class="li"><span>E-wallet fees earned</span><b class="g">${peso(w)}</b></div><div class="li"><span><b>Total income</b> (profit + fees)</span><b class="g">${peso(pr+w)}</b></div></div>
+  <div class="card"><h3>${l.length} sale${l.length===1?'':'s'}</h3>${l.length?l.map(s=>{const c=db.cust.find(x=>x.id===s.cid);return `<div class="li"><div><b>${tm(s.ts)}</b> ${s.method==='utang'?'<span class="tag">UTANG'+(c?' · '+esc(c.name):'')+'</span>':''}<div class="mut">${s.items.map(i=>i.qty+'× '+esc(i.name)).join(', ')}</div></div><div class="r"><b>${peso(s.total)}</b><br><button class="alt sm" data-rc="${s.id}">Receipt</button> <button class="alt sm" data-void="${s.id}">Void</button></div></div>`}).join(''):'<div class="empty">No sales on this day.</div>'}</div>`;
+}
+function vUtang(){
+  const owed=db.cust.reduce((a,c)=>a+Math.max(0,bal(c)),0);
+  return `<div class="card"><div class="li"><span>Total unpaid utang</span><b class="d">${peso(owed)}</b></div></div>
+  <div class="card"><h3>New customer</h3><input id="cn" placeholder="Name"><div class="row"><input id="cp" placeholder="Phone (optional)" inputmode="tel"><input id="cl" type="number" inputmode="decimal" placeholder="Credit limit (0 = none)"></div><button class="big" data-addc="1">Add customer</button></div>
+  ${db.cust.length?db.cust.slice().sort((a,b)=>bal(b)-bal(a)).map(c=>{const b=bal(c),o=open===c.id;return `<div class="card"><div class="li" data-open="${c.id}" style="cursor:pointer;border:0"><div><b>${esc(c.name)}</b><div class="mut">${esc(c.phone||'')}${c.limit?' · limit '+peso(c.limit):''}</div></div><b class="${b>0?'d':'g'}">${peso(b)}</b></div>
+  ${o?`<div style="margin-top:8px"><input id="ua" type="number" inputmode="decimal" placeholder="Amount"><div class="row"><button class="ok" data-pay="${c.id}">Received payment</button><button class="alt" data-add-u="${c.id}">Add utang</button></div>
+  <div style="margin-top:8px">${c.ledger.slice().reverse().map(l=>`<div class="li"><span class="mut">${new Date(l.ts).toLocaleDateString('en-PH',{month:'short',day:'numeric'})} · ${l.type==='utang'?esc(l.note||'Utang'):'Bayad'}</span><b class="${l.type==='utang'?'d':'g'}">${l.type==='utang'?'+':'−'}${peso(l.amt)}</b></div>`).join('')||'<div class="empty">No history yet.</div>'}</div>
+  <button class="alt sm" data-delc="${c.id}" style="margin-top:8px">Delete customer</button></div>`:''}</div>`}).join(''):'<div class="empty">No customers yet. Add the first one above.</div>'}`;
+}
+function vWallet(){
+  const td=day(Date.now()),l=db.wallet.filter(x=>day(x.ts)===td),fee=l.reduce((a,x)=>a+x.fee,0);
+  const by=t=>l.filter(x=>x.type===t).reduce((a,x)=>a+x.amt,0);
+  return `<div class="stats"><div><span class="mut">Fees earned today</span><b class="g">${peso(fee)}</b></div><div><span class="mut">Transactions</span><b>${l.length}</b></div><div><span class="mut">Cash-in handled</span><b>${peso(by('Cash-in'))}</b></div><div><span class="mut">Cash-out handled</span><b>${peso(by('Cash-out'))}</b></div></div>
+  <div class="card"><h3>Log a transaction</h3><div class="row"><select id="wp"><option>GCash</option><option>Maya</option><option>Load</option><option>Other</option></select><select id="wt"><option>Cash-in</option><option>Cash-out</option><option>Load</option><option>Bills</option></select></div>
+  <div class="row"><input id="wa" type="number" inputmode="decimal" placeholder="Amount"><input id="wf" type="number" inputmode="decimal" placeholder="Your fee / profit"></div><input id="wn" placeholder="Note or number (optional)"><button class="big" data-addw="1">Save transaction</button></div>
+  <div class="card"><h3>Today</h3>${l.length?l.map(x=>`<div class="li"><div><b>${esc(x.prov)} · ${x.type}</b> <span class="mut">${tm(x.ts)}</span><div class="mut">${esc(x.note||'')}</div></div><div class="r"><b>${peso(x.amt)}</b><br><span class="g">+${peso(x.fee)}</span> <button class="alt sm" data-delw="${x.id}">✕</button></div></div>`).join(''):'<div class="empty">Nothing logged yet today.</div>'}</div>`;
+}
+function vItems(){
+  const low=db.products.filter(p=>p.stock<=5).length;
+  return `<div class="card"><h3>Add item</h3><div class="row"><input id="ib" placeholder="Barcode (optional)" inputmode="numeric" value="${esc(pendingCode)}"><button class="alt" data-scan="item" style="flex:0 0 auto;margin-bottom:8px">📷 Scan</button></div><input id="in" placeholder="Item name" value="${esc(draft.in||'')}"><div class="row"><input id="ic" type="number" inputmode="decimal" placeholder="Cost" value="${esc(draft.ic||'')}"><input id="ip" type="number" inputmode="decimal" placeholder="Price" value="${esc(draft.ip||'')}"><input id="is" type="number" inputmode="numeric" placeholder="Stock" value="${esc(draft.is||'')}"></div><button class="big" data-addi="1">Add item</button></div>
+  <div class="card"><h3>Inventory ${low?`<span class="tag">${low} low</span>`:''}</h3>${db.products.map(p=>`<div class="li"><div><b>${esc(p.name)}</b><div class="mut">${p.barcode?'▮ '+esc(p.barcode)+' · ':''}Cost ${peso(p.cost)} · Price ${peso(p.price)}</div></div><div class="q" style="flex-wrap:wrap;justify-content:flex-end"><button class="alt sm" data-asg="${p.id}" title="Scan barcode for this item">▮</button><button class="alt sm" data-st="${p.id}:-1">−</button><b class="${p.stock<=5?'d':''}">${p.stock}</b><button class="alt sm" data-st="${p.id}:1">+</button><button class="alt sm" data-st="${p.id}:10">+10</button><button class="alt sm" data-deli="${p.id}">✕</button></div></div>`).join('')||'<div class="empty">No items yet.</div>'}</div>
+  <div class="card"><h3>Store &amp; scanning</h3><input id="sn" placeholder="Store name (shown on receipts)" value="${esc(db.store||'')}"><button class="alt big" data-scan="restock">📷 Scan to restock (+1 per scan)</button></div><div class="card"><h3>Backup</h3><p class="mut" style="margin-top:0">Data is saved on this device. Copy a backup now and then.</p><div class="row"><button class="alt" data-exp="1">Show backup</button><button class="alt" data-imp="1">Restore</button></div>${exp!==''?`<textarea id="bk" rows="5" style="margin-top:8px" placeholder="Paste backup here, then tap Restore">${exp==='-'?'':esc(exp)}</textarea>`:''}</div>`;
+}
+const num=id=>parseFloat($(id).value)||0;
+document.addEventListener('click',e=>{
+  const b=e.target.closest('button,[data-open]');if(!b)return;const d=b.dataset;
+  if(d.t){tab=d.t;return render()}
+  if(d.scan)return openScan(d.scan);
+  if(d.go){$('cartcard').scrollIntoView({behavior:'smooth'});return}
+  if(d.tip){db.tip=1;save();return render()}
+  if(d.cash){const v=d.cash==='x'?total():+d.cash,t=$('tend');t.value=v;t.dispatchEvent(new Event('input',{bubbles:true}));return}
+  if(d.asg)return openScan('assign',d.asg);
+  if(d.closeov)return closeOv();
+  if(d.mc){const v=$('mc').value.trim();if(v){last={code:'',t:0};onCode(v);$('mc').value=''}return}
+  if(d.reg){tab='items';pendingCode=d.reg;draft={};return closeOv()}
+  if(d.rc){const s=db.sales.find(x=>x.id===d.rc);if(s)showRc(s);return}
+  if(d.rprint)return window.print();
+  if(d.rshare){const t=$('rct').textContent;if(navigator.share)navigator.share({text:t}).catch(()=>{});else if(navigator.clipboard)navigator.clipboard.writeText(t).then(()=>toast('Receipt copied'),()=>toast('Press and hold the receipt to copy'));return}
+  if(d.add){const p=db.products.find(x=>x.id===d.add);if(p.stock<=(cart[p.id]||0))return toast('No more stock');cart[p.id]=(cart[p.id]||0)+1;return grid()}
+  if(d.dec){if(--cart[d.dec]<=0)delete cart[d.dec];return grid()}
+  if(d.m){method=d.m;return cartR()}
+  if(d.co)return checkout();
+  if(d.clr){cart={};return cartR()}
+  if(d.void){const s=db.sales.find(x=>x.id===d.void);if(!s)return;s.items.forEach(i=>{const p=db.products.find(x=>x.id===i.id);if(p)p.stock+=i.qty});db.cust.forEach(c=>c.ledger=c.ledger.filter(l=>l.sid!==s.id));db.sales=db.sales.filter(x=>x!==s);save();render();return toast('Sale voided, stock restored')}
+  if(d.open){open=open===d.open?'':d.open;return render()}
+  if(d.addc){const n=$('cn').value.trim();if(!n)return toast('Enter a name');db.cust.push({id:uid(),name:n,phone:$('cp').value.trim(),limit:num('cl'),ledger:[]});save();render();return toast('Customer added')}
+  if(d.pay||d['addU']){const id=d.pay||d.addU,a=num('ua');if(a<=0)return toast('Enter an amount');const c=db.cust.find(x=>x.id===id);
+    if(d.pay&&a>bal(c)&&!confirm('Amount is more than the balance. Continue?'))return;
+    c.ledger.push({id:uid(),ts:Date.now(),type:d.pay?'bayad':'utang',amt:a,note:'Manual'});save();render();return toast(d.pay?'Payment recorded':'Utang added')}
+  if(d.delc){if(confirm('Delete this customer and history?')){db.cust=db.cust.filter(c=>c.id!==d.delc);open='';save();render()}return}
+  if(d.addw){const a=num('wa');if(a<=0)return toast('Enter an amount');db.wallet.unshift({id:uid(),ts:Date.now(),prov:$('wp').value,type:$('wt').value,amt:a,fee:num('wf'),note:$('wn').value.trim()});save();render();return toast('Transaction saved')}
+  if(d.delw){db.wallet=db.wallet.filter(x=>x.id!==d.delw);save();return render()}
+  if(d.addi){const n=$('in').value.trim(),bc=$('ib').value.trim();if(!n||num('ip')<=0)return toast('Enter name and price');if(bc&&db.products.some(p=>p.barcode===bc))return toast('That barcode is already registered');db.products.push({id:uid(),name:n,barcode:bc,cost:num('ic'),price:num('ip'),stock:Math.floor(num('is'))});pendingCode='';draft={};save();render();return toast('Item added')}
+  if(d.st){const[id,n]=d.st.split(':'),p=db.products.find(x=>x.id===id);p.stock=Math.max(0,p.stock+ +n);save();return render()}
+  if(d.deli){if(confirm('Delete this item?')){db.products=db.products.filter(p=>p.id!==d.deli);delete cart[d.deli];save();render()}return}
+  if(d.exp){exp=JSON.stringify(db);return render()}
+  if(d.imp){if(exp===''){exp='-';return render()}try{const j=JSON.parse($('bk').value);if(!j.products||!j.sales)throw 0;if(confirm('Replace all current data with this backup?')){db=j;save();exp='';render();toast('Backup restored')}}catch(x){toast('That backup is not valid')}return}
+});
+document.addEventListener('input',e=>{
+  const t=e.target;
+  if(t.id==='q'){q=t.value;grid()}
+  if(t.id==='tend'){const c=parseFloat(t.value)-total();$('chg').textContent=isNaN(c)?'':(c>=0?'Change: '+peso(c):'Short by '+peso(-c))}
+});
+document.addEventListener('change',e=>{
+  const i=e.target.id,v=e.target.value;
+  if(i==='csel')custSel=v;
+  if(i==='dsel'){disc=v;cartR()}
+  if(i==='dc'){cdisc=parseFloat(v)||0;cartR()}
+  if(i==='idn')idno=v;
+  if(i==='sn'){db.store=v.trim();save()}
+  if(e.target.id==='sd'){sday=e.target.value||sday;render()}
+});
+let asgId='';
+const hue=s=>[...s].reduce((a,c)=>a+c.charCodeAt(0),0)*37%360;
+function bar(){const n=Object.values(cart).reduce((a,b)=>a+b,0);$('bar').innerHTML=(tab==='pos'&&n)?`<button class="ok big" data-go="1" style="box-shadow:0 4px 14px rgba(0,0,0,.3)">🛒 ${n} item${n>1?'s':''} · ${peso(total())} · Review</button>`:''}
+const pad=(a,b)=>a+' '.repeat(Math.max(1,32-a.length-b.length))+b;
+function rtext(s){const c=t=>' '.repeat(Math.max(0,(32-t.length)>>1))+t,f=n=>n.toFixed(2),L=[c(db.store||'Tindahan'),c(new Date(s.ts).toLocaleString('en-PH')),'-'.repeat(32)];
+  s.items.forEach(i=>L.push(i.name,pad('  '+i.qty+' x '+f(i.price),f(i.qty*i.price))));
+  L.push('-'.repeat(32));
+  if(s.disc)L.push(pad('Subtotal',f(s.total+s.disc)),pad('Discount'+(s.idno?' (ID '+s.idno+')':''),'-'+f(s.disc)));
+  L.push(pad('TOTAL',f(s.total)));
+  if(s.method==='utang'){const cu=db.cust.find(x=>x.id===s.cid);L.push('UTANG: '+(cu?cu.name:''))}else if(s.tend)L.push(pad('Cash',f(s.tend)),pad('Change',f(s.tend-s.total)));
+  L.push('',c('Salamat po!'));return L.join('\n')}
+function showRc(s){$('ovr').innerHTML=`<div class="ov"><div class="sheet"><pre class="rc" id="rct">${esc(rtext(s))}</pre><div class="row noprint" style="margin-top:8px"><button data-rprint="1">🖨 Print</button><button class="alt" data-rshare="1">Share / Copy</button></div><button class="alt big noprint" data-closeov="1" style="margin-top:8px">Close</button></div></div>`}
+async function closeOv(){if(scanner){const x=scanner;scanner=null;try{await x.stop();x.clear()}catch(e){}}$('ovr').innerHTML='';render()}
+function openScan(mode,id){
+  if(mode==='item')['in','ic','ip','is'].forEach(k=>draft[k]=$(k).value);
+  scanMode=mode;asgId=id||'';last={code:'',t:0};
+  const T={pos:'Scan to sell',item:'Scan the item barcode',assign:'Scan barcode for this item',restock:'Scan to restock (+1 each)'}[mode];
+  $('ovr').innerHTML=`<div class="ov"><div class="sheet"><h3>${T}</h3><div id="rd"></div><div id="sres" class="card" style="margin-bottom:8px"><span class="mut">Point the camera at a barcode.</span></div><div class="row"><input id="mc" placeholder="Or type the barcode" inputmode="numeric"><button data-mc="1" style="flex:0 0 auto;margin-bottom:8px">OK</button></div><button class="alt big" data-closeov="1">Done</button></div></div>`;
+  if(!window.Html5Qrcode){$('rd').textContent='Scanner could not load. Type the code or use a Bluetooth scanner.';return}
+  scanner=new Html5Qrcode('rd',{experimentalFeatures:{useBarCodeDetectorIfSupported:true},verbose:false});
+  scanner.start({facingMode:'environment'},{fps:10,qrbox:{width:260,height:140}},onCode,()=>{}).catch(()=>{scanner=null;$('rd').innerHTML='<div class="empty">Camera is blocked. Allow camera access for this site, or type the code below.</div>'});
+}
+const cartLines=()=>Object.keys(cart).map(id=>{const p=db.products.find(x=>x.id===id);return `<div class="li"><span>${cart[id]}× ${esc(p.name)}</span><b>${peso(cart[id]*p.price)}</b></div>`}).join('');
+function onCode(code){
+  const n=Date.now();if(code===last.code&&n-last.t<1800)return;last={code,t:n};
+  try{navigator.vibrate&&navigator.vibrate(50)}catch(e){}
+  const p=db.products.find(x=>x.barcode===code),r=$('sres');if(!r)return;
+  if(scanMode==='item'||scanMode==='assign'){
+    if(p&&p.id!==asgId){r.innerHTML=`<b class="d">Already used by ${esc(p.name)}</b>`;return}
+    if(scanMode==='assign'){db.products.find(x=>x.id===asgId).barcode=code;save()}else pendingCode=code;
+    toast('Barcode saved');return closeOv();
+  }
+  if(!p){r.innerHTML=`<b class="d">Not registered yet</b><div class="mut">${esc(code)}</div><button class="sm" data-reg="${esc(code)}">Register this item</button>`;return}
+  if(scanMode==='restock'){p.stock++;save();r.innerHTML=`<b>${esc(p.name)}</b><div class="g">Stock is now ${p.stock}</div>`;return}
+  if(p.stock<=(cart[p.id]||0)){r.innerHTML=`<b class="d">${esc(p.name)}: no more stock</b>`;return}
+  cart[p.id]=(cart[p.id]||0)+1;
+  r.innerHTML=`<div style="font-size:17px"><b>${esc(p.name)}</b> <b style="color:var(--pri)">${peso(p.price)}</b></div>${cartLines()}<div class="li"><b>Cart total</b><b style="color:var(--pri)">${peso(total())}</b></div>`;
+}
+document.addEventListener('keydown',e=>{
+  if(e.key!=='Enter'||e.target.id!=='q')return;
+  const c=e.target.value.trim(),p=db.products.find(x=>x.barcode===c);if(!p)return;
+  q='';e.target.value='';
+  if(p.stock<=(cart[p.id]||0))toast(p.name+': no more stock');else{cart[p.id]=(cart[p.id]||0)+1;toast(p.name+' '+peso(p.price))}
+  grid();
+});
+render();
+</script></body></html>
